@@ -5,10 +5,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
-	
+
 	<PropertyGroup>
 		<PackageId>Smp.Testing.Http</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Description>A simple api mock for testing</Description>
 		<PackageProjectUrl>https://github.com/smatsri/Smp.Testing.Http</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/smatsri/Smp.Testing.Http</RepositoryUrl>
@@ -17,6 +17,10 @@
 		<PackageTags>Testing</PackageTags>
 		<License>MIT</License>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\readme.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
 
 </Project>
