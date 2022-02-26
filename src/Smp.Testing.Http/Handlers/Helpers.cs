@@ -2,7 +2,7 @@
 
 using Models;
 
-public static class Helpers
+static class Helpers
 {
     public static RequestSection ToRequestSection(
         this HttpRequestMessage request)
@@ -66,4 +66,63 @@ public static class Helpers
 
         return clone;
     }
+
+    public static HttpResponseMessage ToHttpResponse(this HttpFile file)
+    {
+        const string ContentTypeKey = "Content-Type";
+
+        var res = new HttpResponseMessage
+        {
+            StatusCode = file.Response.StatusCode
+        };
+
+        res.Headers.TryAddWithoutValidation(Consts.CacheHeader, "");
+
+
+        foreach (var header in file.Response.Headers)
+        {
+            if (header.Key == ContentTypeKey)
+                continue;
+
+            res.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
+
+
+        if (file.Response.Content != null)
+        {
+            var mediaType =
+                file.Response.Headers.ContainsKey(ContentTypeKey)
+                ? file.Response.Headers[ContentTypeKey]
+                : null;
+
+            res.Content = new StringContent(
+                file.Response.Content,
+                System.Text.Encoding.UTF8,
+                mediaType);
+        }
+
+        return res;
+    }
+
+    public static async Task<HttpFile> ToHttpFile(HttpRequestMessage request,
+        HttpResponseMessage response)
+    {
+        var reqSection = request.ToRequestSection();
+        var resSection = await response.ToResponseSection();
+        return new HttpFile(reqSection, resSection);
+    }
+
+    public static Task<HttpFile> ToHttpFile(this Pair pair) 
+        => ToHttpFile(pair.Request, pair.Response);
+
+    public static  Task<HttpFile> ToHttpFile(
+        this Tuple<HttpRequestMessage, HttpResponseMessage> pair)
+    {
+        var (r,s) = pair;
+        return ToHttpFile(r, s);
+    }
+
+    public record Pair(
+        HttpRequestMessage Request,
+        HttpResponseMessage Response);
 }

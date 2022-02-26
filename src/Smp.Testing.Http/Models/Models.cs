@@ -2,13 +2,13 @@
 
 using System.Net;
 
-public record HttpFile(RequestSection Request, ResponseSection Response);
+record HttpFile(RequestSection Request, ResponseSection Response);
 
-public record RequestSection(
+record RequestSection(
     string Url,
     HttpMethod Method,
     Dictionary<string, string> Headers);
-public record ResponseSection(
+record ResponseSection(
     HttpStatusCode StatusCode,
     Dictionary<string, string> Headers,
     string? Content);

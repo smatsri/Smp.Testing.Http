@@ -39,7 +39,11 @@ class CacheDirectory
             return null;
         
         var txt = await File.ReadAllTextAsync(path);
-        return Parser.ParseHttp(txt);
+        var (r,s) = txt.FromText();
+
+        r.Headers.Add(Consts.CacheHeader, path);
+
+        return new(r, s);
     }
 
     public async Task SaveFile(HttpFile file)
