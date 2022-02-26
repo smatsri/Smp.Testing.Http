@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /.logs
 .tye
 /src/Smp.Testing.Http.Tests/cache
+/.vscode
