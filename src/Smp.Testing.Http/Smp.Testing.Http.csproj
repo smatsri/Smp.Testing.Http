@@ -1,9 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<PackageId>Smp.Testing.Http</PackageId>
+		<Version>1.0.0</Version>
+		<Description>A simple api mock for testing</Description>
+		<PackageProjectUrl>https://github.com/smatsri/Smp.Testing.Http</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/smatsri/Smp.Testing.Http</RepositoryUrl>
+		<Authors>shai m</Authors>
+		<Company>Smp</Company>
+		<PackageTags>Testing</PackageTags>
+		<License>MIT</License>
+	</PropertyGroup>
 
 </Project>
