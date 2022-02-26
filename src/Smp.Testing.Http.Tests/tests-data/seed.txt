@@ -1,0 +1,4 @@
+﻿https://gorest.co.in/public/v2/comments
+https://gorest.co.in/public/v2/posts
+https://gorest.co.in/public/v2/users
+https://gorest.co.in/public/v2/todos

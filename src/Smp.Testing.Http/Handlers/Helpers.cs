@@ -1,0 +1,69 @@
+﻿namespace Smp.Testing.Http.Handlers;
+
+using Models;
+
+public static class Helpers
+{
+    public static RequestSection ToRequestSection(
+        this HttpRequestMessage request)
+    {
+        if (request.RequestUri == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var url = request.RequestUri.PathAndQuery;
+        var method = request.Method;
+        var headers = new Dictionary<string, string>();
+
+        foreach (var header in request.Headers)
+        {
+            var value = string.Join(";", header.Value);
+            headers.Add(header.Key, value);
+        }
+
+        return new RequestSection(url, method, headers);
+    }
+
+    public static async Task<ResponseSection> ToResponseSection(this HttpResponseMessage response)
+    {
+        var status = response.StatusCode;
+
+        var headers = new Dictionary<string, string>();
+        foreach (var header in response.Headers)
+        {
+            var value = string.Join(";", header.Value);
+            headers.Add(header.Key, value);
+        }
+
+        var content = string.Empty;
+        if (status == System.Net.HttpStatusCode.OK)
+        {
+            content = await response.Content.ReadAsStringAsync();
+        }
+
+        return new ResponseSection(status, headers, content);
+    }
+
+    public static HttpRequestMessage Clone(this HttpRequestMessage req)
+    {
+        var clone = new HttpRequestMessage(req.Method, req.RequestUri)
+        {
+            Content = req.Content,
+            Version = req.Version
+        };
+
+        foreach (KeyValuePair<string, IEnumerable<string>> header in req.Headers)
+        {
+            try
+            {
+                clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+            catch
+            {
+                continue;
+
+            }
+        }
+
+        return clone;
+    }
+}
