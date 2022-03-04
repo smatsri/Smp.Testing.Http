@@ -10,7 +10,7 @@ static class Helpers
         if (request.RequestUri == null)
             throw new ArgumentNullException(nameof(request));
 
-        var url = request.RequestUri.PathAndQuery;
+        var url = request.RequestUri.ToString();
         var method = request.Method;
         var headers = new Dictionary<string, string>();
 

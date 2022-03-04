@@ -11,7 +11,7 @@ static class ModelsExt
         var rows = str.Split('\n');
         var parts = rows.SplitByEmptyRow(2).ToArray();
         var reqRows = parts[0];
-        var resRows = parts[1];
+        var resRows = parts[1..].Aggregate((a, b) => a.Concat(b).ToArray());
 
         var reqUrlParts = reqRows[0].Split(' ');
         var method = reqUrlParts[0].ParseHttpMethod();
@@ -22,7 +22,8 @@ static class ModelsExt
         var metadata = resParts[0];
         var status = metadata[0].ParseHttpStatusCode();
         var resHeaders = metadata[1..].ParseHeaders();
-        var content = string.Join('\n', resParts[1]).Trim();
+        var aa = resParts[1..].Aggregate((a, b) => a.Concat(b).ToArray());
+        var content = string.Join('\n', aa).Trim();
 
         return new HttpFile(
             new RequestSection(url, method, headers),

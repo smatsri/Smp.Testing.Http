@@ -4,10 +4,10 @@ using Xunit;
 using FluentAssertions;
 
 [Trait("MockApiTests", "")]
-public class MockApiTests
+public class CacheClientTests
 {
     readonly Uri[] uris;
-    public MockApiTests()
+    public CacheClientTests()
     {
         uris = GetFromSeedData().Result;
     }
@@ -16,24 +16,21 @@ public class MockApiTests
     public async Task T1()
     {
         var directoryPath = GetCacheDirPath();
-        var baseAddress = @$"{uris[0].Scheme}:\\{uris[0].Host}";
 
         CleanFolder(directoryPath);
 
         var options = new CacheClientOptions(
-            BaseAddress: baseAddress,
             DirectoryPath: directoryPath
         );
 
         var client = CacheClient.Create(options);
 
-        foreach (var u in uris)
+        foreach (var uri in uris)
         {
-            var uri = u.PathAndQuery;
             await client.GetAsync(uri);
         }
 
-        var numNewFiles = Directory.GetFiles(directoryPath).Length;
+        var numNewFiles = Directory.GetFiles(directoryPath,"*.http", SearchOption.AllDirectories).Length;
         numNewFiles.Should().Be(uris.Length);
     }
 
@@ -41,26 +38,22 @@ public class MockApiTests
     public async void T2()
     {
         var directoryPath = GetCacheDirPath();
-        var baseAddress = @$"{uris[0].Scheme}:\\{uris[0].Host}";
 
-        CleanFolder(directoryPath);
+        //CleanFolder(directoryPath);
 
         var options = new CacheClientOptions(
-            BaseAddress: baseAddress,
             DirectoryPath: directoryPath
         );
 
         var client = CacheClient.Create(options);
 
-        foreach (var u in uris)
+        foreach (var uri in uris)
         {
-            var uri = u.PathAndQuery;
             await client.GetAsync(uri);
         }
 
-        foreach (var u in uris)
+        foreach (var uri in uris)
         {
-            var uri = u.PathAndQuery;
             var res = await client.GetAsync(uri);
             res.IsFromCache().Should().BeTrue();
         }

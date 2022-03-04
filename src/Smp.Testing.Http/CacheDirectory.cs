@@ -30,14 +30,15 @@ class CacheDirectory
     public async Task<HttpFile?> GetFile(HttpMethod method, Uri? uri)
     {
         if (uri == null) return null;
-        return await GetFile(GetPath(method, uri.PathAndQuery));
+        var filePath = GetPath(method, uri);
+        return await GetFile(filePath);
     }
 
     public static async Task<HttpFile?> GetFile(string path)
     {
         if (!File.Exists(path))
             return null;
-        
+
         var txt = await File.ReadAllTextAsync(path);
         var (r,s) = txt.FromText();
 
@@ -48,20 +49,22 @@ class CacheDirectory
 
     public async Task SaveFile(HttpFile file)
     {
-        var path = GetPath(file.Request.Method, file.Request.Url);
+        var path = GetPath(file.Request.Method, new Uri(file.Request.Url));
         var txt = file.ToText();
+        var fileInfo = new FileInfo(path);
+        fileInfo.Directory?.Create();
         await File.WriteAllTextAsync(path, txt);
     }
 
-    public bool Exists(HttpMethod method, string uri)
+    public bool Exists(HttpMethod method, Uri uri)
     {
         var path = GetPath(method, uri);
         return File.Exists(path);
     }
 
-    string GetPath(HttpMethod method, string name)
+    string GetPath(HttpMethod method, Uri uri)
     {
-        var fileName = $"{method.Method}.{ MakeValidFileName(name)}.http";
+        var fileName = Path.Combine(MakeValidFileName(uri.Host), $"{ MakeValidFileName(uri.PathAndQuery)}.{method.Method}.http");
         return Path.Combine(directoryPath, fileName);
     }
 

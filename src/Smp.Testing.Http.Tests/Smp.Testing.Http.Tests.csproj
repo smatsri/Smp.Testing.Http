@@ -29,15 +29,15 @@
 
 
 	<ItemGroup>
-	  <Folder Include="cache\" />
+	  <None Update="tests-data\seed.txt">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 
 
 	<ItemGroup>
-	  <None Update="tests-data\seed.txt">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+	  <Folder Include="cache\" />
 	</ItemGroup>
 
 </Project>
