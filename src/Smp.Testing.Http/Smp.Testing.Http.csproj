@@ -8,7 +8,7 @@
 
 	<PropertyGroup>
 		<PackageId>Smp.Testing.Http</PackageId>
-		<Version>1.1.0</Version>
+		<Version>1.2.0</Version>
 		<Description>A simple api mock for testing</Description>
 		<PackageProjectUrl>https://github.com/smatsri/Smp.Testing.Http</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/smatsri/Smp.Testing.Http</RepositoryUrl>
