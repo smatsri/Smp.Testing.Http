@@ -59,6 +59,20 @@ public class CacheClientTests
         }
     }
 
+    [Fact(DisplayName = "load 1")]
+    public async Task T3()
+    {
+        var directoryPath = GetCacheDirPath();
+
+        var options = new CacheClientOptions(
+            DirectoryPath: directoryPath
+        );
+
+        var client = CacheClient.Create(options);
+
+        var html = await client.GetStringAsync("https://marksfriggin.blogspot.com/2006/08/tuesdays-howard-stern-radio-show.html");
+    }
+
     static string GetCacheDirPath()
     {
         var s = Environment.CurrentDirectory;

@@ -3,32 +3,35 @@
 using System.Net;
 using System.Text;
 
-static class ModelsExt
+public static class ModelsExt
 {
 
     public static HttpFile FromText(this string str)
     {
-        var rows = str.Split('\n');
-        var parts = rows.SplitByEmptyRow(2).ToArray();
-        var reqRows = parts[0];
-        var resRows = parts[1..].Aggregate((a, b) => a.Concat(b).ToArray());
+        var (r, s) = str.SplitBy("\r\n\r\n\r\n");
+        var request = ParseRequest(r);
+        var response = ParseResponse(s);
+        return new HttpFile(request, response);
+    }
 
+    static RequestSection ParseRequest(string str)
+    {
+        var reqRows = str.Split('\n');
         var reqUrlParts = reqRows[0].Split(' ');
         var method = reqUrlParts[0].ParseHttpMethod();
         var url = reqUrlParts[1].Trim();
         var headers = reqRows[1..].ParseHeaders();
+        return new RequestSection(url, method, headers);
+    }
+    static ResponseSection ParseResponse(string str)
+    {
+        var (first, content) = str.SplitBy("\n\r");
+        var rows = first.Split('\n');
 
-        var resParts = resRows.SplitByEmptyRow(1).ToArray();
-        var metadata = resParts[0];
-        var status = metadata[0].ParseHttpStatusCode();
-        var resHeaders = metadata[1..].ParseHeaders();
-        var aa = resParts[1..].Aggregate((a, b) => a.Concat(b).ToArray());
-        var content = string.Join('\n', aa).Trim();
+        var status = rows[0].ParseHttpStatusCode();
+        var resHeaders = rows[1..].ParseHeaders();
 
-        return new HttpFile(
-            new RequestSection(url, method, headers),
-            new ResponseSection(status, resHeaders, content)
-        );
+        return new ResponseSection(status, resHeaders, content);
     }
 
     static HttpMethod ParseHttpMethod(this string str)
@@ -40,46 +43,43 @@ static class ModelsExt
         };
     }
 
-    static IEnumerable<string[]> SplitByEmptyRow(this IEnumerable<string> rows, int numRowSep = 1)
+    public static (string, string) SplitBy(this string str, string sep)
     {
-        var lst = new List<string>();
-        var count = 0;
-        foreach (var row in rows)
-        {
-            if (string.IsNullOrWhiteSpace(row))
-            {
-                count++;
-                if (count == numRowSep)
-                {
-                    lst.RemoveRange(lst.Count - count + 1, count - 1);
-                    yield return lst.ToArray();
-                    count = 0;
-                    lst = new List<string>();
-                    continue;
-                }
-
-
-            }
-
-            lst.Add(row);
-        }
-        if (lst.Count > 0)
-            yield return lst.ToArray();
+        var i = str.IndexOf(sep);
+        if (i == -1) return (str, string.Empty);
+        var f = str[..i];
+        var s = str[(i + sep.Length)..];
+        return (f, s);
     }
 
     static Dictionary<string, string> ParseHeaders(this IEnumerable<string> rows)
     {
-        return rows.Select(r => r.ParseHeader()).ToDictionary(kv => kv.key, kv => kv.value);
+       var empty = (string.Empty, string.Empty);
+
+        return rows
+            .Select(r => ParseHeader(r.Trim()))
+            .Where(a => a != empty)
+            .GroupBy(a => a.key)
+            .ToDictionary(kv => kv.Key, kv => kv.Select(a => a.value).First());
+
+        (string key, string value) ParseHeader(string row)
+        {
+            var (f,s) = row.SplitBy(":");
+            if(string.IsNullOrEmpty(s)) return empty;
+
+            return (f, s);
+        }
     }
 
-    static (string key, string value) ParseHeader(this string row)
-    {
-        var parts = row.Split(':');
-        return (parts[0].Trim(), parts[1].Trim());
-    }
 
-    static HttpStatusCode ParseHttpStatusCode(this string row)
+
+    static int ParseHttpStatusCode(this string row)
     {
+        if (string.IsNullOrEmpty(row))
+        {
+            return -1;
+        }
+
         int code;
         if (row.StartsWith("HTTP"))
         {
@@ -92,7 +92,7 @@ static class ModelsExt
         }
 
 
-        return (HttpStatusCode)code;
+        return code;
     }
 
     public static string ToText(this HttpFile file)

@@ -1,6 +1,7 @@
 ﻿namespace Smp.Testing.Http.Handlers;
 
 using Models;
+using System.Net;
 
 static class Helpers
 {
@@ -40,7 +41,7 @@ static class Helpers
             content = await response.Content.ReadAsStringAsync();
         }
 
-        return new ResponseSection(status, headers, content);
+        return new ResponseSection((int)status, headers, content);
     }
 
     public static HttpRequestMessage Clone(this HttpRequestMessage req)
@@ -73,7 +74,7 @@ static class Helpers
 
         var res = new HttpResponseMessage
         {
-            StatusCode = file.Response.StatusCode
+            StatusCode = (HttpStatusCode)file.Response.StatusCode
         };
 
         res.Headers.TryAddWithoutValidation(Consts.CacheHeader, "");

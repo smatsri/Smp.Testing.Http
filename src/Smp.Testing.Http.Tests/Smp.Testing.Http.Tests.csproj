@@ -29,6 +29,9 @@
 
 
 	<ItemGroup>
+	  <None Update="tests-data\parsing\request.http">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Update="tests-data\seed.txt">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
