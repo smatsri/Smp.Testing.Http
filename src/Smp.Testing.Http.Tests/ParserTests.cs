@@ -3,11 +3,12 @@ using Xunit;
 using FluentAssertions;
 using Smp.Testing.Http.Models;
 using System.Net;
+using Smp.Testing.Http.Tests.Helpers;
 
 [Trait("parsing", "")]
 public class ParserTests
 {
-    [Fact(DisplayName = "can parse http file")]
+    [Fact(DisplayName = "can parse response correctly")]
     public async Task T1()
     {
         var txt = await File.ReadAllTextAsync(@"tests-data\parsing\request.http");
@@ -19,4 +20,21 @@ public class ParserTests
 
     }
 
+
+    [Fact(DisplayName = "can parse multiple test folder")]
+    public void T2()
+    {
+        var files = CacheFolder.GetFiles("marksfriggin.blogspot.com");
+
+        foreach (var file in files.Take(10000))
+        {
+            var txt = File.ReadAllText(file);
+            var http = txt.FromText();
+            http.Response.StatusCode.Should().Be(200);
+            http.Response.Headers.Count.Should().BePositive();
+            http.Request.Headers.Count.Should().Be(0);
+        }
+    }
 }
+
+

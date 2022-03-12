@@ -1,14 +1,14 @@
 ﻿namespace Smp.Testing.Http.Models;
 
-using System.Net;
 using System.Text;
-
 public static class ModelsExt
 {
 
     public static HttpFile FromText(this string str)
     {
-        var (r, s) = str.SplitBy("\r\n\r\n\r\n");
+        
+        str = str.Clean();
+        var (r, s) = str.SplitByNewLine(3);
         var request = ParseRequest(r);
         var response = ParseResponse(s);
         return new HttpFile(request, response);
@@ -25,7 +25,7 @@ public static class ModelsExt
     }
     static ResponseSection ParseResponse(string str)
     {
-        var (first, content) = str.SplitBy("\n\r");
+        var (first, content) = str.SplitByNewLine(2);
         var rows = first.Split('\n');
 
         var status = rows[0].ParseHttpStatusCode();
@@ -43,10 +43,24 @@ public static class ModelsExt
         };
     }
 
-    public static (string, string) SplitBy(this string str, string sep)
+    public static (string, string) SplitByNewLine(this string str, int count = 1)
     {
-        var i = str.IndexOf(sep);
-        if (i == -1) return (str, string.Empty);
+        var sep = new StringBuilder();
+        for (int i = 0; i < count; i++)
+        {
+            sep.AppendLine();
+        }
+
+        return str.SplitBy(sep.ToString());
+    }
+
+    public static (string, string) SplitBy(this string str, params string[] seps)
+    {
+        var (i, sep) = seps
+            .Select(sep => (str.IndexOf(sep), sep))
+            .FirstOrDefault(a => a.Item1 > -1);
+
+        if (i == -1 || string.IsNullOrEmpty(sep)) return (str, string.Empty);
         var f = str[..i];
         var s = str[(i + sep.Length)..];
         return (f, s);
@@ -141,4 +155,6 @@ public static class ModelsExt
             sb.AppendFormat("{0}:{1}\n", header.Key, header.Value);
         }
     }
+
+    static string Clean(this string str) => str.ReplaceLineEndings();
 }

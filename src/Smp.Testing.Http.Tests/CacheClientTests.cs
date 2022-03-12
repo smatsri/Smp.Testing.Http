@@ -2,6 +2,7 @@
 
 using Xunit;
 using FluentAssertions;
+using static Helpers.CacheFolder;
 
 [Trait("MockApiTests", "")]
 public class CacheClientTests
@@ -73,12 +74,7 @@ public class CacheClientTests
         var html = await client.GetStringAsync("https://marksfriggin.blogspot.com/2006/08/tuesdays-howard-stern-radio-show.html");
     }
 
-    static string GetCacheDirPath()
-    {
-        var s = Environment.CurrentDirectory;
-        s = string.Join('\\', s.Split('\\').ToArray().TakeWhile(a => a != "bin"));
-        return Path.Combine(s, "cache");
-    }
+
 
     static async Task<Uri[]> GetFromSeedData()
     {
